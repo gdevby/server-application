@@ -1,0 +1,17 @@
+---
+description: Vue.js фронтенд Cattr
+globs: resources/frontend/**/*
+alwaysApply: false
+---
+
+# Frontend
+
+- Vue-модули в `resources/frontend/core/modules/`
+- Каждый модуль содержит:
+  - `module.init.js` — точка входа модуля
+  - `locales/en.json`, `locales/ru.json` — локализация
+  - `service/*.service.js` — API-сервисы
+  - `views/` — Vue-компоненты
+- Vuex store: `resources/frontend/core/store/modules/`
+- Сборка: `yarn dev` / `yarn prod` (Laravel Mix, `webpack.mix.js`)
+- Следовать структуре соседних модулей (Users, Tasks, Projects и др.)

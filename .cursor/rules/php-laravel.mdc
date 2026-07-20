@@ -1,0 +1,31 @@
+---
+description: Laravel/PHP соглашения Cattr API
+globs: app/**/*.php
+alwaysApply: false
+---
+
+# PHP / Laravel
+
+- PSR-2, отступ 4 пробела (см. `phpcs.xml`)
+- API-контроллеры в `app/Http/Controllers/Api/`, наследуют `ItemController`
+- Задавать `protected const MODEL = SomeModel::class` в контроллере
+- Валидация в Form Request (`app/Http/Requests/{Entity}/`)
+- Авторизация через Policies (`app/Policies/`) и Scopes (`app/Scopes/`)
+- Роли: enum `App\Enums\Role`
+- Ответы: `CattrSuccessResponse` / `CattrErrorResponse`, `flugger/laravel-responder`
+- Бизнес-логику выносить в `app/Services/`, не раздувать контроллеры
+- Apidoc-блоки (`@api`, `@apiPermission`) в контроллерах при добавлении эндпоинтов
+
+## Пример контроллера
+
+```php
+class UserController extends ItemController
+{
+    protected const MODEL = User::class;
+
+    public function list(ListUsersRequest $request): JsonResponse
+    {
+        // ...
+    }
+}
+```

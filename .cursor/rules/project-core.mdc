@@ -1,0 +1,17 @@
+---
+description: "[standalone] Базовые стандарты — при workspace=cattr/ см. корень"
+alwaysApply: true
+---
+
+# Standalone workspace note
+
+Если workspace открыт как `cattr/` (монорепо), правила загружаются из `cattr/.cursor/rules/`.
+Этот файл актуален только при открытии `server-application/` отдельно.
+
+Общие соглашения: [AGENTS.md](../../../AGENTS.md)
+
+- Минимальный scope изменений
+- Следовать паттернам в соседних файлах
+- Не коммитить `.env`, секреты, `.project`, `.settings/`
+- Коммиты — только по явной просьбе
+- Лицензия: SSPL-1.0
