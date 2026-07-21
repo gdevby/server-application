@@ -69,6 +69,34 @@ resources/frontend/core/
 - Доступ через Policies и Scopes
 - Apidoc-блоки в контроллерах для документации
 
+## Планировщик (scheduler)
+
+Cron в образе: `timeout --signal=TERM 50s php82 /app/artisan schedule:run` (каждую минуту, см. `.root-fs/crontab`).
+
+Mutex планировщика хранится в file cache (`storage/framework/cache/data`) и переживает перезапуск контейнера, если `/app/storage` на volume.
+
+### Диагностика
+
+```bash
+php artisan schedule:list              # статус задач, Has Mutex
+ps aux | grep 'schedule:run\|gitlab:sync'
+```
+
+### Восстановление при зависании
+
+```bash
+# снять все mutex планировщика (предпочтительно)
+php artisan schedule:clear-cache
+
+# если завис сам процесс schedule:run
+kill -9 <PID>
+
+# ручной запуск gitlab:sync в обход mutex
+php artisan gitlab:sync --verbose
+```
+
+В проде с ofelia — добавить `timeout` в job command аналогично crontab.
+
 ## Соглашения
 
 - Общие правила монорепо — в [AGENTS.md](../AGENTS.md)

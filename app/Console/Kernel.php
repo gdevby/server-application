@@ -45,12 +45,12 @@ class Kernel extends ConsoleKernel
 
         $schedule->job(new ClearExpiredApps)->daily();
 
-        $schedule->command(RecreateCronTaskWorkers::class)->daily()->runInBackground()->withoutOverlapping();
-        
-        $schedule->command(VerifyAttachments::class)->daily()->runInBackground()->withoutOverlapping();
-        $schedule->command(CalculateEfficiency::class)->daily()->runInBackground()->withoutOverlapping();
+        $schedule->command(RecreateCronTaskWorkers::class)->daily()->runInBackground()->withoutOverlapping(120);
+        $schedule->command(VerifyAttachments::class)->daily()->runInBackground()->withoutOverlapping(120);
+        $schedule->command(CalculateEfficiency::class)->daily()->runInBackground()->withoutOverlapping(120);
+        $schedule->command(FindSusFiles::class)->weekly()->runInBackground()->withoutOverlapping(180);
 
-        $schedule->command(FindSusFiles::class)->weekly()->runInBackground()->withoutOverlapping();
+        $schedule->command('schedule:clear-cache')->hourly();
     }
 
     /**
