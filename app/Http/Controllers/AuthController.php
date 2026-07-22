@@ -248,7 +248,7 @@ class AuthController extends BaseController
         $lifetime = now()->addMinutes(config('auth.lifetime_minutes.desktop_token'));
 
         Cache::store('octane')->put(
-            sha1($request->ip()) . ":$token",
+            $this->desktopKeyCacheKey($request, $token),
             $request->user()->id,
             $lifetime,
         );
@@ -256,7 +256,9 @@ class AuthController extends BaseController
             'token' => $token,
             'type' => 'desktop',
             'expires' => now()->addMinutes(config('auth.lifetime_minutes.desktop_token'))->toIso8601String(),
-        ], new AuthTokenTransformer)->meta(['frontend_uri' => config('app.frontend_url')])->respond();
+        ], new AuthTokenTransformer)->meta([
+            'frontend_uri' => config('app.frontend_url'),
+        ])->respond();
     }
 
     /**
@@ -289,11 +291,13 @@ class AuthController extends BaseController
 
         $token = explode(' ', $token);
 
-        if (count($token) !== 2 || $token[0] !== 'desktop' || !Cache::store('octane')->has(sha1($request->ip()) . ":$token[1]")) {
+        $cacheKey = $this->desktopKeyCacheKey($request, $token[1]);
+
+        if (count($token) !== 2 || $token[0] !== 'desktop' || !Cache::store('octane')->has($cacheKey)) {
             throw new AuthorizationException(AuthorizationException::ERROR_TYPE_UNAUTHORIZED);
         }
 
-        $user = auth()->loginUsingId(Cache::store('octane')->get(sha1($request->ip()) . ":$token[1]"));
+        $user = auth()->loginUsingId(Cache::store('octane')->get($cacheKey));
 
         if (!optional($user)->active) {
             throw new AuthorizationException(AuthorizationException::ERROR_TYPE_USER_DISABLED);
@@ -330,5 +334,10 @@ class AuthController extends BaseController
     public function refresh(): JsonResponse
     {
         throw new DeprecatedApiException();
+    }
+
+    private function desktopKeyCacheKey(Request $request, string $token): string
+    {
+        return sha1($request->ip() . ':' . $token);
     }
 }
