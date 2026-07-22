@@ -291,9 +291,13 @@ class AuthController extends BaseController
 
         $token = explode(' ', $token);
 
+        if (count($token) !== 2 || $token[0] !== 'desktop') {
+            throw new AuthorizationException(AuthorizationException::ERROR_TYPE_UNAUTHORIZED);
+        }
+
         $cacheKey = $this->desktopKeyCacheKey($request, $token[1]);
 
-        if (count($token) !== 2 || $token[0] !== 'desktop' || !Cache::store('octane')->has($cacheKey)) {
+        if (!Cache::store('octane')->has($cacheKey)) {
             throw new AuthorizationException(AuthorizationException::ERROR_TYPE_UNAUTHORIZED);
         }
 

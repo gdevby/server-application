@@ -40,22 +40,25 @@ class StorageCleaner
 
         Cache::store('octane')->set('thinning_now', true);
 
-        $service = app()->make(ScreenshotService::class);
+        try {
+            $service = app()->make(ScreenshotService::class);
 
-        while (self::getUsedSpace() > self::getWaterlineBorder()) {
-            $availableScreenshots = self::getAvailableScreenshots();
+            while (self::getUsedSpace() > self::getWaterlineBorder()) {
+                $availableScreenshots = self::getAvailableScreenshots();
 
-            if (count($availableScreenshots) === 0) {
-                break;
+                if (count($availableScreenshots) === 0) {
+                    break;
+                }
+
+                foreach ($availableScreenshots as $screenshot) {
+                    $service->destroyScreenshot($screenshot);
+                }
             }
 
-            foreach ($availableScreenshots as $screenshot) {
-                $service->destroyScreenshot($screenshot);
-            }
+            Cache::store('octane')->set('last_thin', now());
+        } finally {
+            Cache::store('octane')->set('thinning_now', false);
         }
-
-        Cache::store('octane')->set('thinning_now',false);
-        Cache::store('octane')->set('last_thin',now());
     }
 
     /**
